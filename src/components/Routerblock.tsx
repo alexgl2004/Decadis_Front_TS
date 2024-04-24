@@ -1,4 +1,4 @@
-import { HomeTwoTone, CheckCircleTwoTone, InfoCircleOutlined } from '@ant-design/icons';
+import { HomeTwoTone, InfoCircleOutlined } from '@ant-design/icons';
 import { MenuProps, Layout, Flex, Menu } from 'antd';
 import { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
