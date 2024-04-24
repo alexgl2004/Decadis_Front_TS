@@ -70,9 +70,6 @@ const Routerblock = () => {
             <Menu.Item key="u" icon= {<InfoCircleOutlined />}>
                 <Link to="/users">Users</Link>
             </Menu.Item>
-            <Menu.Item key="c" icon= {<CheckCircleTwoTone />}>
-                <Link to="/nulled">Clear/Create database</Link>
-            </Menu.Item>
           </Menu>
         </Header>
         <Content style={contentStyle}>
