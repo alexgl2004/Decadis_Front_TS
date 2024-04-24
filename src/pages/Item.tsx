@@ -2,16 +2,12 @@
 //NOT finish!!!!
 //Think about user LocalStorage or parametr in Link
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-
-import {
-  Button,
-} from 'antd';
 
 const Item = () => {
 
-  const [item, setItem] = useState(null);
+  const [item, setItem] = useState<any>(null);
 
   useEffect(() => {
     getItem()
@@ -48,8 +44,8 @@ const Item = () => {
           if(data2){
             setItem({
               data: data,
-              position: data2.filter((elem)=>{ return elem.id==data.position_id})[0].name
-            })
+              position: data2.filter((elem: any)=>{ return elem.id==data.position_id})[0].name
+            } as any)
           }
   
         })
