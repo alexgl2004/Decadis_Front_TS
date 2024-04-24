@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Select, Button, Modal, Space } from 'antd';
+import { notification, message, Select, Button, Modal, Space } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
 
 import MoveItem from "../components/MoveItem";
 import ViewItem from "../components/ViewItem";
@@ -20,11 +21,15 @@ const ModalRunAction = (params: AnyObject) => {
     id: string
   }
 */  
-
+  
   const [isModalOpen, setIsModalOpen] = useState([false, false]);
   const [tempAction, setTempAction] = useState<any>(null);
   const [runAction, setRunAction] = useState<any>(null);
   const [modalContent, setModalContent] = useState(null);
+
+  const [api, contextHolder] = notification.useNotification();
+  const [messageApi, contextMHolder] = message.useMessage();
+
 
   function makeCancelAction(){
     setTempAction(
@@ -41,6 +46,8 @@ const ModalRunAction = (params: AnyObject) => {
   function openRunAction(){
     toggleModal(1, true)
 
+    messageApi.open({type: 'loading', content: 'Loading Actions of User in progress..', duration: 0});
+
     const requestOptions = {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
@@ -51,15 +58,26 @@ const ModalRunAction = (params: AnyObject) => {
       return res.json();
     })
     .then((data) => {
+      setTimeout(messageApi.destroy, 0);
       setTempAction({
         acceptedItems:data,
         current:''
       } as any)
-    })
+    }).catch(error => {
+      setTimeout(messageApi.destroy, 0);
+      api.open({
+        message: 'Problem with loading Actions of User',
+        description: "Connection failed. Error: " + error.message,
+        icon: <CloseOutlined style={{ color: 'red' }} />,
+        duration: 0
+      });
+    });
 
   }
 
   function runFucntAction(){
+
+    messageApi.open({type: 'loading', content: 'Proccess for items in progress..', duration: 0});    
 
     switch(runAction.runFunction){
       
@@ -79,14 +97,23 @@ const ModalRunAction = (params: AnyObject) => {
           return res.json();
         })
         .then(() => {
-      
-            setModalContent({
-              title: 'Item successfully moved'
-            } as any)
+          setTimeout(messageApi.destroy, 0);
+          setModalContent({
+            title: 'Item successfully moved'
+          } as any)
 
           toggleModal(2, true)
 
+        }).catch(error => {
+          setTimeout(messageApi.destroy, 0);
+          api.open({
+            message: 'Problem with moving Item',
+            description: "Connection failed. Error: " + error.message,
+            icon: <CloseOutlined style={{ color: 'red' }} />,
+            duration: 0
+          });
         });
+
 
       break;
       case 'delete':
@@ -104,13 +131,21 @@ const ModalRunAction = (params: AnyObject) => {
           return res.json();
         })
         .then(() => {
-      
+          setTimeout(messageApi.destroy, 0);
           setModalContent({
             title: 'Item successfully deleted'
           } as any)
 
           toggleModal(2, true)
 
+        }).catch(error => {
+          setTimeout(messageApi.destroy, 0);
+          api.open({
+            message: 'Problem with deleting Item',
+            description: "Connection failed. Error: " + error.message,
+            icon: <CloseOutlined style={{ color: 'red' }} />,
+            duration: 0
+          });
         });
 
       break;
@@ -131,13 +166,21 @@ const ModalRunAction = (params: AnyObject) => {
           return res.json();
         })
         .then(() => {
-      
+          setTimeout(messageApi.destroy, 0);
           setModalContent({
             title: 'Item: ' + runAction.name +' successfully added',
           } as any)
 
           toggleModal(2, true)
 
+        }).catch(error => {
+          setTimeout(messageApi.destroy, 0);
+          api.open({
+            message: 'Problem with creating Item',
+            description: "Connection failed. Error: " + error.message,
+            icon: <CloseOutlined style={{ color: 'red' }} />,
+            duration: 0
+          });
         });
 
       break;
@@ -156,8 +199,8 @@ const ModalRunAction = (params: AnyObject) => {
           return res.json();
         })
         .then((data) => {
-
-          console.log(data)
+          setTimeout(messageApi.destroy, 0);
+//          console.log(data)
 
           setModalContent({
             title:data.name,
@@ -167,6 +210,14 @@ const ModalRunAction = (params: AnyObject) => {
 
           toggleModal(2, true)
 
+        }).catch(error => {
+          setTimeout(messageApi.destroy, 0);
+          api.open({
+            message: 'Problem with opening Item',
+            description: "Connection failed. Error: " + error.message,
+            icon: <CloseOutlined style={{ color: 'red' }} />,
+            duration: 0
+          });
         });
 
       break;    
@@ -176,6 +227,8 @@ const ModalRunAction = (params: AnyObject) => {
   }
 
   function getPositionsItems(){
+
+    messageApi.open({type: 'loading', content: 'Loading Items in progress..', duration: 0});
 
     const requestOptions = {
       method: 'GET',
@@ -187,7 +240,6 @@ const ModalRunAction = (params: AnyObject) => {
       return res.json();
     })
     .then((data) => {
-
       if(data){    
 
         const requestOptions = {
@@ -200,7 +252,7 @@ const ModalRunAction = (params: AnyObject) => {
           return res.json();
         })        
         .then((data2) => {
-
+          setTimeout(messageApi.destroy, 0);
           if(data2){
             setRunAction({
               items: data,
@@ -208,12 +260,28 @@ const ModalRunAction = (params: AnyObject) => {
             } as any)
           }
 
+        }).catch(error => {
+          setTimeout(messageApi.destroy, 0);
+          api.open({
+            message: 'Problem with loading Positions',
+            description: "Connection failed. Error: " + error.message,
+            icon: <CloseOutlined style={{ color: 'red' }} />,
+            duration: 0
+          });
         })
 
       }else{
 
       }
 
+    }).catch(error => {
+      setTimeout(messageApi.destroy, 0);
+      api.open({
+        message: 'Problem with loading Positions',
+        description: "Connection failed. Error: " + error.message,
+        icon: <CloseOutlined style={{ color: 'red' }} />,
+        duration: 0
+      });
     });
     
   }
@@ -306,6 +374,9 @@ const ModalRunAction = (params: AnyObject) => {
 
       </Modal>
       <ContentShowElem content={modalContent} toggleModal={toggleModal} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+
+      {contextHolder}
+      {contextMHolder}
     </>
   );
 };

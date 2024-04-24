@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Select } from 'antd';
+import { AnyObject } from 'antd/es/_util/type';
 
-const ViewItem = (params) => {
+const ViewItem = (params: AnyObject) => {
 
   useEffect(() => {
     params.getPositionsItems()
   }, []);  
 
-  const onChangeItemChecked = (elem) => {
+  const onChangeItemChecked = (elem: any) => {
 
     params.setRunAction({
       ...params.runAction,
@@ -17,28 +18,24 @@ const ViewItem = (params) => {
 
   }
 
-  function returnArraysFor(elems){
+  function returnArraysFor(elems: any){
 
     if(elems.length==0){
-      return [[],[]]
+      return {}
     }
-
-    const selectedBox = elems.map((elem)=>{
-        return String(elem.id)
-    })
     
-    const arr_options = elems.map((elem)=>{
+    const arr_options = elems.map((elem:AnyObject)=>{
       return {
         'label':elem.name,
         'value':String(elem.id)
       }
     })
   
-    return [selectedBox, arr_options]
+    return arr_options
 
   }
 
-  const [ selectBox_items, arr_options_items ] = returnArraysFor(params.runAction?params.runAction.items:[])
+  const arr_options_items = returnArraysFor(params.runAction?params.runAction.items:[])
 
   return (
     <>

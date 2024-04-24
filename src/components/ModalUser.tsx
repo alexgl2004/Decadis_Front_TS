@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { ExclamationCircleFilled } from '@ant-design/icons';
-import { Checkbox, Form, Input, Button, Modal, Space } from 'antd';
+import { CloseOutlined, ExclamationCircleFilled } from '@ant-design/icons';
+import { notification, message, Checkbox, Form, Input, Button, Modal, Space } from 'antd';
+
 import type { GetProp } from 'antd';
+
 
 import ContentShowElem from "../components/ContentShowElem.jsx";
 import { AnyObject } from 'antd/es/_util/type.js';
@@ -13,6 +15,9 @@ const ModalUser = (params : AnyObject) => {
   const [isModalOpen, setIsModalOpen] = useState([false, false]);
   const [tempUser, setTempUser] = useState<any>(null);
   const [modalContent, setModalContent] = useState(null);
+
+  const [api, contextHolder] = notification.useNotification();
+  const [messageApi, contextMHolder] = message.useMessage();
 
   function makeNullUser(){
     setTempUser({
@@ -42,6 +47,7 @@ const ModalUser = (params : AnyObject) => {
 
   function saveUser(add=0){
 
+    messageApi.open({type: 'loading', content: 'Saving User in progress..', duration: 0});
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -53,6 +59,7 @@ const ModalUser = (params : AnyObject) => {
       return res.json();
     })
     .then(() => {
+      setTimeout(messageApi.destroy, 0);
       params.getUsers()
       setModalContent({
         title: 'Item successfully ' + (add?'created':'updated')
@@ -60,6 +67,15 @@ const ModalUser = (params : AnyObject) => {
 
       toggleModal(2, true) 
     })
+    .catch(error => {
+      setTimeout(messageApi.destroy, 0);
+      api.open({
+        message: 'Problem with save User',
+        description: "Connection failed. Error: " + error.message,
+        icon: <CloseOutlined style={{ color: 'red' }} />,
+        duration: 0
+      });
+    });
   }
 
   function delUser(userId: number){
@@ -69,6 +85,7 @@ const ModalUser = (params : AnyObject) => {
       icon: <ExclamationCircleFilled />,
       content: 'This process does not delete items created by this user',
       onOk() {
+        messageApi.open({type: 'loading', content: 'Deleting User in progress..', duration: 0});
         const requestOptions = {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -79,8 +96,18 @@ const ModalUser = (params : AnyObject) => {
           return res.json();
         })
         .then(() => {
+          setTimeout(messageApi.destroy, 0);
           params.getUsers()
         })
+        .catch(error => {
+          setTimeout(messageApi.destroy, 0);
+          api.open({
+            message: 'Problem with delete User',
+            description: "Connection failed. Error: " + error.message,
+            icon: <CloseOutlined style={{ color: 'red' }} />,
+            duration: 0
+          });
+        });
       },
       onCancel() {
 
@@ -207,6 +234,9 @@ const ModalUser = (params : AnyObject) => {
         ''}
       </Modal>
       <ContentShowElem content={modalContent} toggleModal={toggleModal} isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+
+      {contextHolder}
+      {contextMHolder}
     </>
   );
 };

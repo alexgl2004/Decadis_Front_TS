@@ -2,12 +2,18 @@ import { useEffect, useState } from 'react'
 import ModalUser from "../components/ModalUser.jsx";
 import ModalRunAction from "../components/ModalRunAction.jsx";
 import { AnyObject } from 'antd/es/_util/type.js';
+import { CloseOutlined } from '@ant-design/icons';
+import { notification, message } from 'antd';
+
+//<LoadingOutlined />
 
 const Users = () => {
 
   const [users, setUsers] = useState<any>(null);
   const [actions, setActions] = useState(null);
-  
+  const [api, contextHolder] = notification.useNotification();
+  const [messageApi, contextMHolder] = message.useMessage();
+
 //  const [filterUser, setFilterUser] = useState({text:''});//Don't needed maybe later
 
   useEffect(() => {
@@ -16,6 +22,8 @@ const Users = () => {
   }, []);
   
   function getActions(){
+
+    messageApi.open({type: 'loading', content: 'Loading Actions in progress..', duration: 0});
 
     const requestOptions = {
       method: 'GET',
@@ -28,28 +36,42 @@ const Users = () => {
       return res.json();
     })
     .then((data) => {
+      setTimeout(messageApi.destroy, 0);
       if(data){
         setActions(data)
       }else{
 
       }
 
+    })
+    .catch(error => {
+      setTimeout(messageApi.destroy, 0);
+      api.open({
+        message: 'Problem with loading Actions',
+        description: "Connection failed. Error: " + error.message,
+        icon: <CloseOutlined style={{ color: 'red' }} />,
+        duration: 0
+      });
     });
 //    }, [user]);
     
   }   
 
   function getUsers(){
+
+    messageApi.open({type: 'loading', content: 'Loading Users in progress..', duration: 0});
+
     const requestOptions = {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
-    };        
+    };
 
     fetch('http://localhost:3000/users', requestOptions)
     .then((res) => {
       return res.json();
     })
     .then((data) => {
+      setTimeout(messageApi.destroy, 0);
       if(data.usersData){
         setUsers({
           firstLoaded: data.usersData,
@@ -59,8 +81,17 @@ const Users = () => {
 
       }
 
+    })
+    .catch(error => {
+      api.open({
+        message: 'Problem with loading Users',
+        description: "Connection failed. Error: " + error.message,
+        icon: <CloseOutlined style={{ color: 'red' }} />,
+        duration: 0
+      });
+      setTimeout(messageApi.destroy, 0);
     });
-    
+  
   } 
 
   return (
@@ -94,6 +125,8 @@ const Users = () => {
               }
             )
             :''}
+        {contextHolder}
+        {contextMHolder}
       </div>
     </>
   )
