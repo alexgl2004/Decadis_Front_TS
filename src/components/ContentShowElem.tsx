@@ -4,7 +4,6 @@ import { AnyObject } from 'antd/es/_util/type';
 const ContentModal = (params : AnyObject) => {
 
   return (
-    <>
       <Modal
         title={params.content?params.content.title:''}
         open={params.isModalOpen[2]}
@@ -30,7 +29,6 @@ const ContentModal = (params : AnyObject) => {
         
       </>
       </Modal>
-    </>
   );
 };
 export default ContentModal;
